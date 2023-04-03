@@ -176,6 +176,8 @@ Nob* divide_no(Nob* no_dividir){
         aux = aux->prox;
     }
     set_filho(aux, novo);
+
+    
     
 
 
