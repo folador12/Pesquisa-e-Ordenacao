@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "listadupla.h"
-#include "math.h"
+#include <math.h>
+#include <windows.h>
 
 struct nob
 {
@@ -31,7 +32,8 @@ typedef struct chave
 
 Arvoreb* cria_arvoreb(int ordem);
 Nob* cria_nob();
-Listad *divide_lista(Listad *L, int n);
-Listad* insere_ordenado_lista(Listad* lista_nos,Chave *chave_nova);
+//void divide(Arvoreb *tree);
+Listad* insere_ordenado_listad(Listad* lista_nos,
+                     Chave *chave_nova);
 
 #endif
