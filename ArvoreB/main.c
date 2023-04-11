@@ -19,16 +19,7 @@ int main()
     int i=0;
     int tam=34;
     tree = cria_arvoreb(4);
-  
-/*
-    for (i=0; i<tam; i++)
-    {
-        tree=insere_arvoreb(tree,vet[i]);
-    }
 
-
-*/
-   // tree=libera_arvoreb(tree);
    
    return 0;
 }

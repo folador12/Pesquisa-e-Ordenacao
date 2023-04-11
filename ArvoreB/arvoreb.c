@@ -76,6 +76,30 @@ Listad* insere_ordenado_lista(Listad* lista_nos, Chave *chave_nova)
     }
     return lista_nos;
 }
+Listad* insere_inicio_listad(Listad *L, void* valor){
+    Nod *novo= cria_nod(valor);
+
+    if (L == NULL)
+    {
+        L = cria_listad();
+        L->ini = L->fim = novo;
+
+    }
+    else
+    {
+        if (L->ini == NULL)
+            L->ini = L->fim = novo;
+        else
+        {
+            novo->prox = L->ini;
+            L->ini->ant = novo;
+            L->ini = novo;
+        }
+    }
+    return L;
+
+}
+
 
 Chave* cria_chave(int valor){
     Chave* ch = (Chave*)malloc(sizeof(Chave));
@@ -101,7 +125,21 @@ Nob* set_filho(Nod* aux,Nob* novo_filho){
 }
 
 Nob* cria_nova_raiz(Chave* ch, Nob* folha, Nob* novo){
-    
+
+    Nob *raiz = cria_nob();
+
+    raiz->lista_chaves = insere_inicio_listad(raiz->lista_chaves, (void *)ch);
+    raiz->qtd_chaves = 1;
+    raiz->folha = 0;
+    raiz->pai = NULL;
+
+    folha->pai = raiz;
+    novo->pai = raiz;
+
+    set_filho(raiz->lista_chaves->ini, folha);
+    set_filho(raiz->lista_chaves->ini->prox, novo);
+
+    return raiz;
 }
 
 void insercao_arvoreb(Arvoreb *tree, int chave){
@@ -149,7 +187,7 @@ Nob* localiza_folha(Arvoreb *tree, int chave)
 {
     Nob* aux = tree->raiz;
 
-    while (aux->folha == 0) //não for uma folha
+    while (aux->folha == 0) 
     {
         Nod* aux_lista = aux->lista_chaves->ini;
         while (aux_lista->prox != NULL && chave > get_valor_chave(aux_lista))
@@ -157,7 +195,7 @@ Nob* localiza_folha(Arvoreb *tree, int chave)
             aux_lista = aux_lista->prox;
         }
 
-        aux = get_filho(aux_lista); //((Chave*)aux_lista->info)->filho;
+        aux = get_filho(aux_lista); 
         
     }
     
@@ -179,8 +217,6 @@ Nob* divide_no(Nob* no_dividir){
 
     Chave* ch_subir = get_ultima_chave(no_dividir);
     ch_subir->filho = no_dividir;
-
-    //localiza apontador do no dividir
 
     Nod* aux = no_dividir->pai->lista_chaves->ini;
 
