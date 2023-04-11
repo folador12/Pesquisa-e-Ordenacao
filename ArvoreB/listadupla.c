@@ -1,9 +1,5 @@
 #include "listadupla.h"
-/*
-para testar a lista generica com inteiros
 
-   L = insere_inicio_listad(L, cria_inteiro(5));
-*/
 int * cria_inteiro (int n)
 { int *a = malloc(sizeof(int));
     *a = n;
