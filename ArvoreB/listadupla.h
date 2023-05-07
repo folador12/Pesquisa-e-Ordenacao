@@ -22,7 +22,7 @@ Listad* cria_listad();
 Nod* cria_nod(void* valor);
 Listad* insere_inicio_listad(Listad *L, void* valor);
 Listad* insere_fim_listad(Listad *L, void* valor);
-void* remove_fim_listas(Listad *L);
+void* remove_fim_listad(Listad *L);
 void* remove_inicio_listad(Listad *L);
 Listad* libera_listad(Listad *L);
 int eh_vazia_listad(Listad *L);

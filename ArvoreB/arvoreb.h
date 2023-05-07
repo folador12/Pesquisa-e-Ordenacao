@@ -6,12 +6,13 @@
 #include "listadupla.h"
 #include <math.h>
 #include <windows.h>
+#include "fila.h"
 
 struct nob
 {
-    int folha; //1 se for folha, 0 caso contrario
+    int folha; // 1 se for folha, 0 caso contrario
     int qtd_chaves;
-    struct nob* pai;
+    struct nob *pai;
     Listad *lista_chaves;
 };
 
@@ -22,7 +23,7 @@ typedef struct arvoreb
     Nob *raiz;
     int ordem;
     int altura;
-}Arvoreb;
+} Arvoreb;
 
 typedef struct chave
 {
@@ -30,17 +31,23 @@ typedef struct chave
     Nob *filho;
 } Chave;
 
-Arvoreb* cria_arvoreb(int ordem);
-Nob* cria_nob();
-Listad* insere_ordenado_lista(Listad* lista_nos, Chave *chave_nova);
+void insercao_arvoreb(Arvoreb *tree, int chave);
+Nob *localiza_folha(Arvoreb *tree, int chave);
+Arvoreb *cria_arvoreb(int ordem);
+Nob *cria_nob();
+Listad *insere_ordenado_listad(Listad *lista_nos, Chave *chave_nova);
 Chave *cria_chave(int valor);
 Listad *divide_lista(Listad *L, int n);
-Chave* cria_chave(int valor);
-int get_valor_chave(Nod* aux);
-Nob* get_filho(Nod* aux);
-Nob* set_filho(Nod* aux,Nob* novo_filho);
-void insercao_arvoreb(Arvoreb *tree, int chave);
-Nob* localiza_folha(Arvoreb *tree, int chave);
-Nob* divide_no(Nob* no_dividir);
+int get_valor_chave(Nod *aux);
+Nob *get_filho(Nod *aux);
+void set_filho(Nod *aux, Nob *novo_filho);
+Chave *remove_ultima_chave(Nob *folha);
+Listad *insere_primeira_chave(Listad *L, void *ch);
+Nob *divide_no(Nob *no_dividir);
+void em_ordem(Nob *raiz);
+void mostra_nob(Nob *raiz, int detalhe);
+Arvoreb *libera_arvoreb(Arvoreb *T);
+Nob *libera_nob(Nob *raiz);
+Nob *cria_nova_raiz(Chave *chave_a_subir, Nob *no_insercao, Nob *novo);
 
 #endif

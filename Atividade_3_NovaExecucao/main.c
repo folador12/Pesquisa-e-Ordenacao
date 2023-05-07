@@ -3,14 +3,14 @@
 
 struct nod
 {
-    void* info;
+    void *info;
     struct nod *ant;
     struct nod *prox;
 };
 typedef struct nod Nod;
 
 struct listad
-{   
+{
     int tamanho;
     Nod *ini;
     Nod *fim;
@@ -40,21 +40,22 @@ void espalha_irmao(Nom *raiz, int *nro_infectados);
 
 //------------------Lista Dupla------------------//
 
-Listad* cria_listad();
-Nod* cria_nod(void* valor);
-void mostra_listad(Listad* L);
-Listad* insere_inicio_listad(Listad *L, void* valor);
-Listad* insere_fim_listad(Listad* L, void* valor);
-Listad* libera_listad(Listad *L);
+Listad *cria_listad();
+Nod *cria_nod(void *valor);
+void mostra_listad(Listad *L);
+Listad *insere_inicio_listad(Listad *L, void *valor);
+Listad *insere_fim_listad(Listad *L, void *valor);
+Listad *libera_listad(Listad *L);
 
-int compara (const void * a, const void * b) {
-   return ( *(int*)a - *(int*)b );
+int compara(const void *a, const void *b)
+{
+    return (*(int *)a - *(int *)b);
 }
 
 int main()
 {
-    
-    Nom* tree;
+
+    Nom *tree;
     int nro_casos;
     int nro_nos;
     int *pais;
@@ -66,54 +67,52 @@ int main()
     {
         scanf("%d", &nro_nos);
         tree = cria_nom(1);
-        pais = (int*)malloc(sizeof(int)*(nro_casos)-1);
-        for (i=0;i<nro_nos-1; i++)
-         scanf("%d", &pais[i]);
-        
-        qsort(pais,nro_nos-1, sizeof(int), compara);
-        for (i=0; i<nro_nos-1; i++)
-            insere(tree, i+2, pais[i]);
+        pais = (int *)malloc(sizeof(int) * (nro_casos)-1);
+        for (i = 0; i < nro_nos - 1; i++)
+            scanf("%d", &pais[i]);
 
+        qsort(pais, nro_nos - 1, sizeof(int), compara);
+        for (i = 0; i < nro_nos - 1; i++)
+            insere(tree, i + 2, pais[i]);
 
         nro_casos--;
-        //infecta(tree,nro_nos);
-        mostra(tree);
-        //printf("MAIS filhos: %d",maior->info);
+        infecta(tree, nro_nos);
+        // mostra(tree);
+        //  printf("MAIS filhos: %d",maior->info);
 
         libera_arvorem(tree);
-        tree=NULL;
+        tree = NULL;
     }
-    
+
     return 0;
 }
 
 //------------------Lista Dupla------------------//
-Listad* cria_listad()
+Listad *cria_listad()
 {
-    Listad* novalista;
+    Listad *novalista;
     novalista = (Listad *)malloc(sizeof(Listad));
     novalista->ini = novalista->fim = NULL;
-    novalista->tamanho=0;
+    novalista->tamanho = 0;
     return novalista;
 }
 
-Nod* cria_nod(void* valor)
+Nod *cria_nod(void *valor)
 {
-    Nod* novo = (Nod*)malloc(sizeof(Nod));
+    Nod *novo = (Nod *)malloc(sizeof(Nod));
     novo->ant = novo->prox = NULL;
     novo->info = valor;
     return novo;
 }
 
-Listad* insere_inicio_listad(Listad *L, void* valor)
+Listad *insere_inicio_listad(Listad *L, void *valor)
 {
-    Nod *novo= cria_nod(valor);
+    Nod *novo = cria_nod(valor);
 
     if (L == NULL)
     {
         L = cria_listad();
         L->ini = L->fim = novo;
-
     }
     else
     {
@@ -127,10 +126,9 @@ Listad* insere_inicio_listad(Listad *L, void* valor)
         }
     }
     return L;
-
 }
 
-Listad* insere_fim_listad(Listad* L, void* valor)
+Listad *insere_fim_listad(Listad *L, void *valor)
 {
     Nod *novo = cria_nod(valor);
 
@@ -142,8 +140,7 @@ Listad* insere_fim_listad(Listad* L, void* valor)
     else
     {
 
-
-        if(L->ini == NULL)
+        if (L->ini == NULL)
         {
             L->ini = L->fim = novo;
         }
@@ -157,7 +154,7 @@ Listad* insere_fim_listad(Listad* L, void* valor)
     return L;
 }
 
-Listad* libera_listad(Listad *L)
+Listad *libera_listad(Listad *L)
 {
     Nod *aux = L->ini;
 
@@ -249,6 +246,7 @@ void infecta(Nom *raiz, int nro_nos)
     Nod *aux;
     Nom *maior;
     int nro_infectados = 0;
+
     if (raiz != NULL)
     {
         // 1a. injecao
@@ -265,11 +263,14 @@ void infecta(Nom *raiz, int nro_nos)
                 espalha_irmao(raiz, &nro_infectados);
             }
 
-            aux= raiz->filhos->ini;
-            
+            aux = raiz->filhos->ini;
+
             while (aux != NULL)
             {
-                infecta(get_filho(aux), nro_nos);
+                if (nro_infectados == nro_nos)
+                {
+                    infecta(get_filho(aux), nro_nos);
+                }
                 aux = aux->prox;
             }
         }
@@ -311,7 +312,8 @@ void libera_arvorem(Nom *raiz)
     }
 }
 void mostra(Nom *raiz)
-{   Nod *aux;
+{
+    Nod *aux;
     if (raiz != NULL)
     {
         printf("%d(%d) ", raiz->info, raiz->nro_filhos);
