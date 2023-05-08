@@ -1,21 +1,34 @@
+#include "arvorebplus.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "arvorebplus.h"
-
 int main()
 {
-    Node *raiz;
+    Arvoreb *tree;
 
-    raiz = NULL;
+    int vet[] =
+        {
+            50, 30, 40, 44, 88, 95,
+            25, 91, 31, 52, 20, 60,
+            70, 74, 78, 79, 22, 28,
+            33, 39, 98, 85, 86, 87,
+            90, 92, 93, 94, 35, 32,
+            84, 99, 105, 110};
 
-    raiz = inserir(raiz, 5, 33);
-    raiz = inserir(raiz, 15, 21);
-    raiz = inserir(raiz, 25, 31);
-    raiz = inserir(raiz, 25, 41);
-    raiz = inserir(raiz, 45, 10);
+    int i = 0;
+    int tam = 10; // 34;
+    tree = cria_arvoreb(5);
 
-    printArvore(raiz);
+    for (i = 0; i < tam; i++)
+    {
+        insercao_arvoreb(tree, vet[i]);
+    }
+    insercao_arvoreb(tree, vet[i]);
+
+    // em_ordem(tree->raiz);
+    printf("\n\n\n");
+    printf("\n\n\n");
+    tree = libera_arvoreb(tree);
 
     return 0;
 }

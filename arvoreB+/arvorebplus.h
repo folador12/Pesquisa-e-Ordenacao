@@ -1,47 +1,53 @@
 #ifndef arvorebplus_h
 #define arvorebplus_h
-// #include <stdbool.h>
-#include <stdio.h>
+
 #include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
+#include "listadupla.h"
+#include <math.h>
+#include <windows.h>
+#include "fila.h"
 
-typedef struct registro
+struct nob
 {
-    int valor;
-} Registro;
+    int folha; // 1 se for folha, 0 caso contrario
+    int qtd_chaves;
+    struct nob *pai;
+    Listad *lista_chaves;
+};
 
-// Node
-typedef struct node
+typedef struct nob Nob;
+
+typedef struct arvoreb
 {
-    void **ponteiro;
-    int *chave;
-    struct node *pai;
-    int eh_folha;
-    int num_chave;
-    struct node *prox;
-} Node;
+    Nob *raiz;
+    int ordem;
+    int altura;
+} Arvoreb;
 
-void inserir_fila(Node *new_node);
-Node *desenfileirar(void);
+typedef struct chave
+{
+    int valor_chave;
+    Nob *filho;
+} Chave;
 
-int caminhoFolha(Node *const raiz, Node *filho);
-
-void printArvore(Node *const raiz);
-Node *encontrarFolha(Node *const raiz, int chave, int verbose);
-Registro *encontrar(Node *raiz, int chave, int verbose, Node **fora_folha);
-int cut(int length);
-
-Registro *criarRegistro(int valor);
-Node *criaNode(void);
-Node *criaFolha(void);
-int getIndiceEsquerda(Node *pai, Node *esquerda);
-Node *inserirFolha(Node *folha, int chave, Registro *ponteiro);
-Node *inserirFolhaAposDivisao(Node *raiz, Node *folha, int chave, Registro *ponteiro);
-Node *inserirNode(Node *raiz, Node *pai, int indice_esquerda, int chave, Node *direita);
-Node *inserirNodeAposDivisao(Node *raiz, Node *pai, int indice_esquerda, int chave, Node *direita);
-Node *inserirPai(Node *raiz, Node *esquerda, int chave, Node *direita);
-Node *inserirNovaRaiz(Node *esquerda, int chave, Node *direita);
-Node *iniciarNovaArvore(int chave, Registro *ponteiro);
-Node *inserir(Node *raiz, int chave, int valor);
+void insercao_arvorebplus(Arvoreb *tree, int chave);
+Nob *localiza_folha(Arvoreb *tree, int chave);
+Arvoreb *cria_arvoreb(int ordem);
+Nob *cria_nob();
+Listad *insere_ordenado_listad(Listad *lista_nos, Chave *chave_nova);
+Chave *cria_chave(int valor);
+Listad *divide_lista(Listad *L, int n);
+int get_valor_chave(Nod *aux);
+Nob *get_filho(Nod *aux);
+void set_filho(Nod *aux, Nob *novo_filho);
+Chave *remove_ultima_chave(Nob *folha);
+Listad *insere_primeira_chave(Listad *L, void *ch);
+Nob *divide_no(Nob *no_dividir);
+void em_ordem(Nob *raiz);
+void mostra_nob(Nob *raiz, int detalhe);
+Arvoreb *libera_arvoreb(Arvoreb *T);
+Nob *libera_nob(Nob *raiz);
+Nob *cria_nova_raiz(Chave *chave_a_subir, Nob *no_insercao, Nob *novo);
 
 #endif

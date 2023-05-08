@@ -47,8 +47,7 @@ Listad *divide_lista(Listad *L, int n)
     return L2;
 }
 
-Listad *insere_ordenado_listad(Listad *lista_nos,
-                               Chave *chave_nova)
+Listad *insere_ordenado_listad(Listad *lista_nos, Chave *chave_nova)
 {
 
     Nod *aux = lista_nos->ini;
