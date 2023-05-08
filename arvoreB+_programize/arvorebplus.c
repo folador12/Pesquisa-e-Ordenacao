@@ -1,6 +1,5 @@
 #include "arvorebplus.h"
 
-#define ORDER 3
 Node *queue = NULL;
 
 void inserir_fila(Node *novo_no)
@@ -219,7 +218,7 @@ Registro *criarRegistro(int valor)
     return novo_registro;
 }
 
-Node *criaNode(void)
+Node *criaNode(int ordem)
 {
     Node *novo_node;
     novo_node = malloc(sizeof(Node));
@@ -228,13 +227,13 @@ Node *criaNode(void)
         perror("Node creation.");
         exit(EXIT_FAILURE);
     }
-    novo_node->chave = malloc((ORDER - 1) * sizeof(int));
+    novo_node->chave = malloc((ordem - 1) * sizeof(int));
     if (novo_node->chave == NULL)
     {
         perror("New node keys array.");
         exit(EXIT_FAILURE);
     }
-    novo_node->ponteiro = malloc(ORDER * sizeof(void *));
+    novo_node->ponteiro = malloc(ordem * sizeof(void *));
     if (novo_node->ponteiro == NULL)
     {
         perror("New node pointers array.");
@@ -247,9 +246,9 @@ Node *criaNode(void)
     return novo_node;
 }
 
-Node *criaFolha(void)
+Node *criaFolha(int ordem)
 {
-    Node *folha = criaNode();
+    Node *folha = criaNode(ordem);
     folha->eh_folha = 1;
     return folha;
 }
@@ -281,7 +280,7 @@ Node *inserirFolha(Node *folha, int chave, Registro *ponteiro)
     return folha;
 }
 
-Node *inserirFolhaAposDivisao(Node *raiz, Node *folha, int chave, Registro *ponteiro)
+Node *inserirFolhaAposDivisao(Node *raiz, Node *folha, int chave, Registro *ponteiro, int ordem)
 {
 
     Node *nova_folha;
@@ -289,9 +288,9 @@ Node *inserirFolhaAposDivisao(Node *raiz, Node *folha, int chave, Registro *pont
     void **temp_ponteiros;
     int indice_insercao, dividir, nova_chave, i, j;
 
-    nova_folha = criaFolha();
+    nova_folha = criaFolha(ordem);
 
-    temp_chave = malloc(ORDER * sizeof(int));
+    temp_chave = malloc(ordem * sizeof(int));
 
     if (temp_chave == NULL)
     {
@@ -299,7 +298,7 @@ Node *inserirFolhaAposDivisao(Node *raiz, Node *folha, int chave, Registro *pont
         exit(EXIT_FAILURE);
     }
 
-    temp_ponteiros = malloc(ORDER * sizeof(void *));
+    temp_ponteiros = malloc(ordem * sizeof(void *));
 
     if (temp_ponteiros == NULL)
     {
@@ -308,7 +307,7 @@ Node *inserirFolhaAposDivisao(Node *raiz, Node *folha, int chave, Registro *pont
     }
 
     indice_insercao = 0;
-    while (indice_insercao < ORDER - 1 && folha->chave[indice_insercao] < chave)
+    while (indice_insercao < ordem - 1 && folha->chave[indice_insercao] < chave)
     {
         indice_insercao++;
     }
@@ -329,7 +328,7 @@ Node *inserirFolhaAposDivisao(Node *raiz, Node *folha, int chave, Registro *pont
 
     folha->num_chave = 0;
 
-    dividir = cut(ORDER - 1);
+    dividir = cut(ordem - 1);
 
     for (i = 0; i < dividir; i++)
     {
@@ -338,7 +337,7 @@ Node *inserirFolhaAposDivisao(Node *raiz, Node *folha, int chave, Registro *pont
         folha->num_chave++;
     }
 
-    for (i = dividir, j = 0; i < ORDER; i++, j++)
+    for (i = dividir, j = 0; i < ordem; i++, j++)
     {
         nova_folha->ponteiro[j] = temp_ponteiros[i];
         nova_folha->chave[j] = temp_chave[i];
@@ -348,14 +347,14 @@ Node *inserirFolhaAposDivisao(Node *raiz, Node *folha, int chave, Registro *pont
     free(temp_ponteiros);
     free(temp_chave);
 
-    nova_folha->ponteiro[ORDER - 1] = folha->ponteiro[ORDER - 1];
-    folha->ponteiro[ORDER - 1] = nova_folha;
+    nova_folha->ponteiro[ordem - 1] = folha->ponteiro[ordem - 1];
+    folha->ponteiro[ordem - 1] = nova_folha;
 
-    for (i = folha->num_chave; i < ORDER - 1; i++)
+    for (i = folha->num_chave; i < ordem - 1; i++)
     {
         folha->ponteiro[i] = NULL;
     }
-    for (i = nova_folha->num_chave; i < ORDER - 1; i++)
+    for (i = nova_folha->num_chave; i < ordem - 1; i++)
     {
         nova_folha->ponteiro[i] = NULL;
     }
@@ -363,7 +362,7 @@ Node *inserirFolhaAposDivisao(Node *raiz, Node *folha, int chave, Registro *pont
     nova_folha->pai = folha->pai;
     nova_chave = nova_folha->chave[0];
 
-    return inserirPai(raiz, folha, nova_chave, nova_folha);
+    return inserirPai(raiz, folha, nova_chave, nova_folha, ordem);
 }
 
 Node *inserirNode(Node *raiz, Node *pai, int indice_esquerda, int chave, Node *direita)
@@ -383,7 +382,7 @@ Node *inserirNode(Node *raiz, Node *pai, int indice_esquerda, int chave, Node *d
     return raiz;
 }
 
-Node *inserirNodeAposDivisao(Node *raiz, Node *pai, int indice_esquerda, int chave, Node *direita)
+Node *inserirNodeAposDivisao(Node *raiz, Node *pai, int indice_esquerda, int chave, Node *direita, int ordem)
 {
 
     int i, j, dividir, k;
@@ -391,14 +390,14 @@ Node *inserirNodeAposDivisao(Node *raiz, Node *pai, int indice_esquerda, int cha
     int *temp_chave;
     Node **temp_ponteiro;
 
-    temp_ponteiro = malloc((ORDER + 1) * sizeof(Node *));
+    temp_ponteiro = malloc((ordem + 1) * sizeof(Node *));
 
     if (temp_ponteiro == NULL)
     {
         exit(EXIT_FAILURE);
     }
 
-    temp_chave = malloc(ORDER * sizeof(int));
+    temp_chave = malloc(ordem * sizeof(int));
 
     if (temp_chave == NULL)
     {
@@ -427,8 +426,8 @@ Node *inserirNodeAposDivisao(Node *raiz, Node *pai, int indice_esquerda, int cha
     temp_ponteiro[indice_esquerda + 1] = direita;
     temp_chave[indice_esquerda] = chave;
 
-    dividir = cut(ORDER);
-    novo_node = criaNode();
+    dividir = cut(ordem);
+    novo_node = criaNode(ordem);
     pai->num_chave = 0;
 
     for (i = 0; i < dividir - 1; i++)
@@ -442,7 +441,7 @@ Node *inserirNodeAposDivisao(Node *raiz, Node *pai, int indice_esquerda, int cha
     pai->ponteiro[i] = temp_ponteiro[i];
     k = temp_chave[dividir - 1];
 
-    for (++i, j = 0; i < ORDER; i++, j++)
+    for (++i, j = 0; i < ordem; i++, j++)
     {
         novo_node->ponteiro[j] = temp_ponteiro[i];
         novo_node->chave[j] = temp_chave[i];
@@ -463,10 +462,10 @@ Node *inserirNodeAposDivisao(Node *raiz, Node *pai, int indice_esquerda, int cha
         filho->pai = novo_node;
     }
 
-    return inserirPai(raiz, pai, k, novo_node);
+    return inserirPai(raiz, pai, k, novo_node, ordem);
 }
 
-Node *inserirPai(Node *raiz, Node *esquerda, int chave, Node *direita)
+Node *inserirPai(Node *raiz, Node *esquerda, int chave, Node *direita, int ordem)
 {
 
     int indice_esquerda;
@@ -476,23 +475,23 @@ Node *inserirPai(Node *raiz, Node *esquerda, int chave, Node *direita)
 
     if (pai == NULL)
     {
-        return inserirNovaRaiz(esquerda, chave, direita);
+        return inserirNovaRaiz(esquerda, chave, direita, ordem);
     }
 
     indice_esquerda = getIndiceEsquerda(pai, esquerda);
 
-    if (pai->num_chave < ORDER - 1)
+    if (pai->num_chave < ordem - 1)
     {
         return inserirNode(raiz, pai, indice_esquerda, chave, direita);
     }
 
-    return inserirNodeAposDivisao(raiz, pai, indice_esquerda, chave, direita);
+    return inserirNodeAposDivisao(raiz, pai, indice_esquerda, chave, direita, ordem);
 }
 
-Node *inserirNovaRaiz(Node *esquerda, int chave, Node *direita)
+Node *inserirNovaRaiz(Node *esquerda, int chave, Node *direita, int ordem)
 {
 
-    Node *raiz = criaNode();
+    Node *raiz = criaNode(ordem);
     raiz->chave[0] = chave;
     raiz->ponteiro[0] = esquerda;
     raiz->ponteiro[1] = direita;
@@ -503,19 +502,20 @@ Node *inserirNovaRaiz(Node *esquerda, int chave, Node *direita)
     return raiz;
 }
 
-Node *iniciarNovaArvore(int chave, Registro *ponteiro)
+Node *iniciarNovaArvore(int chave, Registro *ponteiro, int ordem)
 {
 
-    Node *raiz = criaFolha();
+    Node *raiz = criaFolha(ordem);
     raiz->chave[0] = chave;
     raiz->ponteiro[0] = ponteiro;
-    raiz->ponteiro[ORDER - 1] = NULL;
+    raiz->ponteiro[ordem - 1] = NULL;
     raiz->pai = NULL;
     raiz->num_chave++;
+    ordem = ordem;
     return raiz;
 }
 
-Node *inserir(Node *raiz, int chave, int valor)
+Node *inserir(Node *raiz, int chave, int valor, int ordem)
 {
 
     Registro *registo_ponteiro = NULL;
@@ -532,16 +532,16 @@ Node *inserir(Node *raiz, int chave, int valor)
 
     if (raiz == NULL)
     {
-        return iniciarNovaArvore(chave, registo_ponteiro);
+        return iniciarNovaArvore(chave, registo_ponteiro, ordem);
     }
 
     folha = encontrarFolha(raiz, chave, 0);
 
-    if (folha->num_chave < ORDER - 1)
+    if (folha->num_chave < ordem - 1)
     {
         folha = inserirFolha(folha, chave, registo_ponteiro);
         return raiz;
     }
 
-    return inserirFolhaAposDivisao(raiz, folha, chave, registo_ponteiro);
+    return inserirFolhaAposDivisao(raiz, folha, chave, registo_ponteiro, ordem);
 }
