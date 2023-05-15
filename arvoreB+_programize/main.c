@@ -9,11 +9,11 @@ int main()
 
     raiz = NULL;
 
-    raiz = inserir(raiz, 5, 33, 3);
-    raiz = inserir(raiz, 15, 21, 3);
-    raiz = inserir(raiz, 25, 31, 3);
-    raiz = inserir(raiz, 25, 41, 3);
-    raiz = inserir(raiz, 45, 10, 3);
+    raiz = inserir(raiz, 5, 0, 3);
+    raiz = inserir(raiz, 15, 0, 3);
+    raiz = inserir(raiz, 25, 0, 3);
+    raiz = inserir(raiz, 25, 0, 3);
+    raiz = inserir(raiz, 45, 0, 3);
 
     printArvore(raiz);
 
