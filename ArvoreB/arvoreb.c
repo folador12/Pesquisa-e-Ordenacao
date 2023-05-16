@@ -47,7 +47,8 @@ Listad *divide_lista(Listad *L, int n)
     return L2;
 }
 
-Listad *insere_ordenado_listad(Listad *lista_nos, Chave *chave_nova)
+Listad *insere_ordenado_listad(Listad *lista_nos,
+                               Chave *chave_nova)
 {
 
     Nod *aux = lista_nos->ini;
@@ -95,6 +96,29 @@ void set_filho(Nod *aux, Nob *novo_filho)
 {
     ((Chave *)aux->info)->filho = novo_filho;
 }
+
+/*
+inicio
+  encontre uma folha para inserir a chave  K
+  enquanto tem valor para inserir
+  insira K na folha encontrada (insere ordenado na lista)
+  se (nó não está cheio) entao
+         marque que não tem mais valor para inserir
+  senão
+        divida o nó em nó1 e nó2; //nó1 == nó, nó2 eh novo
+     K = ultima chave de nó1; //a qual é retirada de nó1
+        se (nó era a raiz) entao
+            crie uma nova raiz como ascendente de nó1 e nó2;
+            coloque K e ponteiros para nó1 e nó2 na raiz e
+            marque que não tem mais valor para inserir
+        senao
+            folha = seu pai;
+        fimse
+  fimse
+  fimenquanto
+fim
+*/
+
 void insercao_arvoreb(Arvoreb *tree, int chave)
 {
 
@@ -122,9 +146,14 @@ void insercao_arvoreb(Arvoreb *tree, int chave)
             {
                 novo = divide_no(folha);
                 ch = remove_ultima_chave(folha);
+                // atualiza quem aponta para o nó que foi dividido
+                // ch->filho = folha;
+
                 if (folha == tree->raiz)
                 {
+
                     tree->raiz = cria_nova_raiz(ch, folha, novo);
+                    tree->altura++;
                     tem_valor = 0;
                 }
                 else
@@ -138,9 +167,10 @@ void insercao_arvoreb(Arvoreb *tree, int chave)
 
 Chave *remove_ultima_chave(Nob *folha)
 {
-    void *ch = remove_fim_listad(folha->lista_chaves);
+    void *ch = remove_fim_listad(folha->lista_chaves); // tira o -1
     Chave *ult = (Chave *)remove_fim_listad(folha->lista_chaves);
-    folha->lista_chaves = insere_fim_listad(folha->lista_chaves, ch);
+    folha->lista_chaves = insere_fim_listad(folha->lista_chaves, ch); // volta o -1
+    folha->qtd_chaves--;
     return ult;
 }
 
@@ -169,7 +199,7 @@ Nob *localiza_folha(Arvoreb *tree, int chave)
 }
 Chave *get_ultima_chave(Nob *aux)
 {
-    return ((Chave *)aux->lista_chaves->fim->ant->info);
+    return ((Chave *)aux->lista_chaves->fim->ant->info); // fim eh o no -1, deve pegar o anterior
 }
 Nob *divide_no(Nob *no_dividir)
 {
@@ -185,42 +215,45 @@ Nob *divide_no(Nob *no_dividir)
     */
     novo->lista_chaves = divide_lista(
         no_dividir->lista_chaves, n);
+    novo->folha = no_dividir->folha;
+    novo->qtd_chaves = no_dividir->qtd_chaves - n;
+    novo->pai = no_dividir->pai;
+
     // colocar -1 no final do nó que dividiu
     no_dividir->lista_chaves = insere_fim_listad(
         no_dividir->lista_chaves, (void *)cria_chave(-1));
     no_dividir->qtd_chaves = n;
 
-    novo->folha = no_dividir->folha;
-    novo->qtd_chaves = no_dividir->qtd_chaves - n;
-    novo->pai = no_dividir->pai;
-
-    if (no_dividir->folha != 0) // for folha
+    // coloca o novo nó na "arvore  "
+    //  localiza o apontador do no_dividir no seu pai e coloca o novo nele
+    if (no_dividir->pai != NULL)
     {
-        ch_subir = get_ultima_chave(no_dividir);
-        ch_subir->filho = no_dividir;
+        aux = no_dividir->pai->lista_chaves->ini;
 
-        // localiza o apontador do no_dividir
-        if (no_dividir->pai != NULL)
-        {
-            aux = no_dividir->pai->lista_chaves->ini;
+        while (get_filho(aux) != no_dividir)
+            aux = aux->prox;
+        // faz esse apontador apontar para o novo
 
-            while (get_filho(aux) != no_dividir)
-                aux = aux->prox;
-
-            set_filho(aux, novo);
-        }
+        set_filho(aux, novo);
     }
-    else
+
+    if (no_dividir->folha == 0) // nao for folha
     {
+
+        // atualiza o pai dos filhos que foram para o novo nó
         aux = novo->lista_chaves->ini;
-        while (aux->prox != NULL)
+        while (aux != NULL)
         {
             get_filho(aux)->pai = novo;
             aux = aux->prox;
         }
-        set_filho(aux, novo);
-    }
 
+        // "salva" o filho da chave que vai subir no filho do -1
+
+        set_filho(no_dividir->lista_chaves->fim, get_ultima_chave(no_dividir)->filho);
+        
+    }
+    set_filho(no_dividir->lista_chaves->fim->ant, no_dividir);
     return novo;
 }
 
@@ -230,12 +263,18 @@ Nob *cria_nova_raiz(Chave *chave_a_subir, Nob *no_insercao, Nob *novo)
 
     nova_raiz->folha = 0;
     nova_raiz->lista_chaves = insere_primeira_chave(nova_raiz->lista_chaves, chave_a_subir);
+    //   nova_raiz->lista_chaves = insere_fim_listad(
+    //  nova_raiz->lista_chaves, (void *)cria_chave(-1));
+
     nova_raiz->pai = NULL;
     nova_raiz->qtd_chaves = 1;
+
     set_filho(nova_raiz->lista_chaves->fim, novo);
+
     chave_a_subir->filho = no_insercao;
     novo->pai = nova_raiz;
     no_insercao->pai = nova_raiz;
+
     return nova_raiz;
 }
 
@@ -244,14 +283,17 @@ Nob *libera_nob(Nob *raiz)
     Nod *aux;
     if (raiz != NULL)
     {
-        aux = raiz->lista_chaves->ini;
-        while (aux != NULL)
+        if (raiz->lista_chaves != NULL)
         {
-            ((Chave *)aux->info)->filho = libera_nob(((Chave *)aux->info)->filho);
-            aux = aux->prox;
-        }
+            aux = raiz->lista_chaves->ini;
+            while (aux != NULL)
+            {
+                libera_nob(((Chave *)aux->info)->filho);
+                aux = aux->prox;
+            }
 
-        free(raiz);
+            free(raiz);
+        }
     }
     return NULL;
 }
@@ -286,8 +328,11 @@ void mostra_nob(Nob *raiz, int detalhe)
     while (aux != NULL)
     {
         // filho
-        //   printf("-%p ",((Chave*)aux->info)->filho);
-
+        /* if (((Chave*)aux->info)->filho == NULL)
+             printf("*nulo*");
+         else
+            printf("*tem* ",((Chave*)aux->info)->filho);
+ */
         printf("%d ", ((Chave *)aux->info)->valor_chave);
 
         aux = aux->prox;
@@ -304,8 +349,139 @@ void em_ordem(Nob *raiz)
         while (aux != NULL)
         {
             em_ordem(get_filho(aux));
-            printf("%d ", get_valor_chave(aux));
+            /*     if (((Chave*)aux->info)->filho == NULL)
+                printf("*nulo*");
+            else
+               printf("* %p * ",((Chave*)aux->info)->filho);
+    */
+            if (get_valor_chave(aux) != -1)
+                printf("%d ", get_valor_chave(aux));
             aux = aux->prox;
+        }
+    }
+}
+
+void percurso_em_nivel_posicionado(Arvoreb *T)
+{
+    int largura = 280; // pow(2, T->altura)*T->ordem*2;
+    Fila *f = cria_fila();
+    enqueue(f, (void *)T->raiz);
+    // gotoxy(0,4);
+    em_nivel_posicionado(f, 1, largura);
+}
+
+void em_nivel_posicionado(Fila *f, int nivel, int largura_tela)
+{
+    Fila *f_nova = cria_fila();
+    Nob *auxb = NULL;
+    Nod *aux = NULL;
+    int nro_elementos = pow(2, nivel);
+    int intervalo = largura_tela / (nro_elementos + 1);
+    int x = 3;
+    while (eh_vazia_fila(f) != 1)
+    {
+        auxb = (Nob *)dequeue(f);
+
+        gotoxy(intervalo + x, nivel + 1);
+        mostra_nob(auxb, 0);
+
+        //  if (auxb != NULL)
+        {
+            aux = auxb->lista_chaves->ini;
+            while (aux != NULL)
+            {
+                if (((Chave *)aux->info)->filho != NULL)
+                    enqueue(f_nova, (void *)((Chave *)aux->info)->filho);
+                aux = aux->prox;
+            }
+        }
+        x = x + intervalo;
+    }
+    printf("\n");
+    if (!eh_vazia_fila(f_nova))
+        em_nivel_posicionado(f_nova, nivel + 1, largura_tela);
+}
+
+// Função gotoxy
+void gotoxy(int x, int y)
+{
+    COORD coord;
+
+    coord.X = x;
+    coord.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+void mostraNo(Nob *raiz)
+{
+    Listad *l = raiz->lista_chaves;
+    Nod *aux = l->ini;
+
+    /*
+
+    //pai
+        if (raiz->pai == NULL)
+            printf("pai: nulo-");
+        else
+            printf("pai:%d-",((chave*)raiz->pai->listaChaves->inicio->info)->valorChave);
+
+    //esquerda
+        if (raiz->esquerda == NULL)
+            printf("esq: nulo-");
+        else
+            printf("esq:%d-",((chave*)raiz->esquerda->listaChaves->inicio->info)->valorChave);
+
+
+
+        printf("(%d)Folha:%d ", raiz->qtdeChaves, raiz->isFolha);
+
+        */
+
+    // valores
+    printf("[");
+    while (aux != NULL)
+    {
+
+        printf("%d ", get_valor_chave(aux));
+        // filho
+        //   printf("-%p ",      ((chave*)aux->info)->filho);
+
+        aux = aux->prox;
+    }
+    printf("]");
+}
+
+void mostraArvore(Arvoreb *tree)
+{
+
+    int nivel = 0;
+
+    while (nivel <= tree->altura)
+    {
+
+        percursoEmNivel(tree->raiz, nivel, tree->altura);
+        printf("\n");
+        nivel++;
+    }
+}
+
+void percursoEmNivel(Nob *raiz, int nivel, int altura)
+{
+    Nod *aux;
+    Nob *auxb = raiz;
+    if (raiz != NULL)
+    {
+        if (altura == nivel)
+        {
+            mostraNo(raiz);
+        }
+        percursoEmNivel(auxb, nivel + 1, altura);
+        aux = auxb->lista_chaves->ini->prox;
+        while (aux != NULL)
+        {
+            auxb = (Nob *)get_filho(aux);
+            aux = aux->prox;
+            percursoEmNivel(auxb, nivel + 1, altura);
         }
     }
 }
