@@ -20,7 +20,9 @@ void preenche_vertices(Grafo *g)
 {
     int i;
     for (i = 0; i < g->ordem; i++)
+    {
         g->vertices[i] = i + 1;
+    }
 }
 
 void preenche_arestas(Grafo *g)
@@ -28,8 +30,9 @@ void preenche_arestas(Grafo *g)
     int i, j;
     for (i = 0; i < g->ordem; i++)
         for (j = 0; j < g->ordem; j++)
-           scanf("%d", &g->adjacencias[i][j]);
-
+        {
+            scanf("%d", &g->adjacencias[i][j]);
+        }
 }
 
 void mostra_grafo(Grafo *g)
@@ -39,52 +42,40 @@ void mostra_grafo(Grafo *g)
     {
         printf("%i -> ", g->vertices[i]);
         for (j = 0; j < g->ordem; j++)
+        {
             if (g->adjacencias[i][j] != 0)
+            {
                 printf("%d - ", j + 1);
+            }
+        }
     }
 }
-
-/*
-
-Procedimento BUSCA-AMPL(v)
-   visitado(v)  sim
-   Colocar v em uma fila
-   Enquanto fila não vazia faça
-      w  retirar o elemento da frente da fila
-      Para cada vértice i adjacente a w faça
-         Se visitado(i) = não então
-           visitado(i)  sim
-           Colocar i no final da fila
-         fim-se
-      fim-para
-   fim-enquanto
-Fim
-
-*/
 
 void limpa(Grafo *g)
 {
     int i;
     for (i = 0; i < g->ordem; i++)
+    {
         g->visitados[i] = 0;
+    }
 }
 
 void percurso_largura(Grafo *g)
 {
     Fila *f = cria_fila();
-    int *w, *nro;
+    int *w;
     int i;
 
     limpa(g);
     g->visitados[0] = 1; // visitei o primeiro vertice
     w = (int *)malloc(sizeof(int));
     *w = 0;
-    enqueue(f, (void *)nro);
+    enqueue(f, (void *)w);
 
     while (!eh_vazia_fila(f))
     {
         w = (int *)dequeue(f);
-        printf("%d \n", g->vertices[*w]);
+        printf(" LARGURA %d \n", g->vertices[*w]);
         for (i = 0; i < g->ordem; i++)
         {
             if (g->adjacencias[*w][i] == 1)
@@ -92,53 +83,28 @@ void percurso_largura(Grafo *g)
                 if (!g->visitados[i])
                 {
                     g->visitados[i] = 1; // visitei o primeiro vertice
-                    nro = (int *)malloc(sizeof(int));
-                    *nro = i;
-                    enqueue(f, (void *)nro);
+                    w = (int *)malloc(sizeof(int));
+                    *w = i;
+                    enqueue(f, (void *)w);
                 }
             }
         }
     }
 }
 
-/*
-Procedimento PROF(nó v)
-   visitado(v)  sim
-   Para cada nó w adjacente a v faça
-      Se visitado(w) = não então
-         PROF(w)
-   fim-para
-Fim
-*/
-
-void prof(int v)
+void prof(int v, Grafo *g)
 {
-    int w;
+    int i;
     g->visitados[v] = 1;
-    printf("%d \n", v+1);
-    for (w = 0; w < g->ordem; w++)
+    printf(" PROFUNDIDADE %d \n", v + 1);
+    for (i = 0; i < g->ordem; i++)
     {
-        if (g->adjacencias[v][w] == 1)
+        if (g->adjacencias[v][i] && !g->visitados[i])
         {
-            if (!g->visitados[w])
-            {
-                prof(w);
-            }
+            prof(i, g);
         }
     }
 }
-
-/*
-Procedimento BUSCA-PROF
-   Para i = 1,...,n faça
-      visitado(i)  não
-   fim-para
-   Para i = 1,...,n faça
-      Se visitado(i) = não então
-         PROF(i)
-   fim-para
-Fim
-*/
 
 void profundidade(Grafo *g)
 {
@@ -150,7 +116,7 @@ void profundidade(Grafo *g)
 
         if (!g->visitados[i])
         {
-            prof(i);
+            prof(i, g);
         }
     }
 }
@@ -158,13 +124,9 @@ void profundidade(Grafo *g)
 // retorna 1 se existe caminho de origem para destino
 int busca_largura(int origem, int destino, Grafo *g)
 {
-
-
 }
 
 // retorna 1 se existe caminho de origem para destino
 int busca_profundidade(int origem, int destino, Grafo *g)
 {
-
-
 }
