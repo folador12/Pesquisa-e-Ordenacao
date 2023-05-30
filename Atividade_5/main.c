@@ -49,9 +49,10 @@ int main(int argc, char const *argv[])
                 g->adjacencias[Y - 1][X - 1] = 1;
             }
             Busca_Largura(g, L - 1, P, cont);
-        }
 
-        cont++;
+            free(g);
+            cont++;
+        }
 
     } while (C != 0 && E != 0 && L != 0 && P != 0);
     return 0;
@@ -102,23 +103,23 @@ void Busca_Largura(Grafo *g, int inicio, int Pedagio, int conter)
         if (g->adjacencias[inicio][i] == 1 && !g->visitados[i])
         {
             g->visitados[i] = 1;
-            Cidades[cont] = i;
+            Cidades[cont] = i + 1;
             cont++;
 
             for (j = 0; j < g->ordem; j++)
             {
                 if (g->adjacencias[i][j] == 1 && !g->visitados[j])
                 {
-                    g->visitados[j] = 1;
                     P++;
+                    g->visitados[j] = 1;
                     if (P <= Pedagio)
                     {
-                        Cidades[cont] = j;
+                        Cidades[cont] = j + 1;
                         cont++;
                     }
                 }
+                P = 1;
             }
-            P = 1;
         }
     }
 
@@ -128,7 +129,7 @@ void Busca_Largura(Grafo *g, int inicio, int Pedagio, int conter)
     {
         if (Cidades[i] != -1)
         {
-            printf("%d ", Cidades[i] + 1);
+            printf("%d ", Cidades[i]);
         }
     }
     printf("\n\n");

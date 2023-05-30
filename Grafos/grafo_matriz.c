@@ -10,7 +10,7 @@ Grafo *cria_grafo(int n, int valorado, int direcionado)
     g->ordem = n;
     g->vertices = (int *)malloc(sizeof(int) * n);
     g->visitados = (int *)malloc(sizeof(int) * n);
-    g->adjacencias = (int *)malloc(sizeof(int) * n);
+    g->adjacencias = (int **)malloc(sizeof(int *) * n);
     for (i = 0; i < n; i++)
         g->adjacencias[i] = (int *)malloc(sizeof(int) * n);
     return g;
@@ -45,7 +45,7 @@ void mostra_grafo(Grafo *g)
         printf("%i -> ", g->vertices[i]);
         for (j = 0; j < g->ordem; j++)
         {
-            if (g->adjacencias[i][j] != 0)
+            if (g->adjacencias[i][j] == 0)
             {
                 printf("%d - ", j + 1);
             }
