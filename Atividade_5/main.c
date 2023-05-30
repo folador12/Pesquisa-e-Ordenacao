@@ -17,60 +17,40 @@ void preenche_vertices(Grafo *g);
 void limpa(Grafo *g);
 void Busca_Largura(Grafo *g, int inicio);
 
-int main()
+int main(int argc, char const *argv[])
 {
-    int E = 0, L = 0;
-    int lin = 0, col = 0;
+    int C = 0, E = 0, L = 0, P = 0;
+    int X = 0, Y = 0;
     int cont = 1;
-    int parametro = 1;
     Grafo *g = NULL;
 
     do
     {
+        scanf("%d", &C);
         scanf("%d", &E);
         scanf("%d", &L);
+        scanf("%d", &P);
 
-        if (E != 0 && L != 0)
+        if (E != 0 && L != 0 && C != 0 && P != 0)
         {
-            g = cria_grafo(E, 0, 0);
+            g = cria_grafo(C, 0, 0);
             preenche_vertices(g);
-            for (int i = 0; i < L; i++)
+            for (int i = 0; i < E; i++)
             {
-                scanf("%d", &lin);
-                scanf("%d", &col);
+                scanf("%d", &X);
+                scanf("%d", &Y);
 
-                g->adjacencias[lin - 1][col - 1] = 1;
-                g->adjacencias[col - 1][lin - 1] = 1;
+                g->adjacencias[X - 1][Y - 1] = 1;
+                g->adjacencias[Y - 1][X - 1] = 1;
             }
-            Busca_Largura(g, 0);
-
-            for (int i = 0; i < g->ordem; i++)
-            {
-                if (!g->visitados[i])
-                {
-                    parametro = 0;
-                }
-            }
-
-            if (parametro == 1)
-            {
-                printf("Teste %d\n", cont);
-                printf("normal\n\n");
-            }
-            else
-            {
-                printf("Teste %d\n", cont);
-                printf("falha\n\n");
-            }
-            limpa(g);
-            free(g);
-            cont++;
         }
 
-    } while (E != 0 && L != 0);
+        cont++;
+
+    } while (E != 0 && L != 0 && C != 0 && P != 0);
+    return 0;
 }
 
-// GRAFO
 Grafo *cria_grafo(int n, int valorado, int direcionado)
 {
     int i;
@@ -94,16 +74,9 @@ void preenche_vertices(Grafo *g)
         g->vertices[i] = i + 1;
 }
 
-void limpa(Grafo *g)
-{
-    int i;
-    for (i = 0; i < g->ordem; i++)
-        g->visitados[i] = 0;
-}
-
 void Busca_Largura(Grafo *g, int inicio)
 {
-    int i, j;
+    int i, j, cont = 0;
     for (i = 0; i < g->ordem; i++)
     {
         g->visitados[i] = 0;
@@ -119,8 +92,11 @@ void Busca_Largura(Grafo *g, int inicio)
                 if (g->adjacencias[i][j] == 1 && !g->visitados[j])
                 {
                     g->visitados[j] = 1;
+                    cont++;
                 }
             }
         }
     }
+
+    limpa(g);
 }
