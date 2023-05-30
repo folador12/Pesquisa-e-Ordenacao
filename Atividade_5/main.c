@@ -15,7 +15,12 @@ typedef struct grafo
 Grafo *cria_grafo(int n, int valorado, int direcionado);
 void preenche_vertices(Grafo *g);
 void limpa(Grafo *g);
-void Busca_Largura(Grafo *g, int inicio);
+void Busca_Largura(Grafo *g, int inicio, int Pedagio, int conter);
+
+int cmpfunc(const void *a, const void *b)
+{
+    return (*(int *)a - *(int *)b);
+}
 
 int main(int argc, char const *argv[])
 {
@@ -31,7 +36,7 @@ int main(int argc, char const *argv[])
         scanf("%d", &L);
         scanf("%d", &P);
 
-        if (E != 0 && L != 0 && C != 0 && P != 0)
+        if (C != 0 && E != 0 && L != 0 && P != 0)
         {
             g = cria_grafo(C, 0, 0);
             preenche_vertices(g);
@@ -43,11 +48,12 @@ int main(int argc, char const *argv[])
                 g->adjacencias[X - 1][Y - 1] = 1;
                 g->adjacencias[Y - 1][X - 1] = 1;
             }
+            Busca_Largura(g, L - 1, P, cont);
         }
 
         cont++;
 
-    } while (E != 0 && L != 0 && C != 0 && P != 0);
+    } while (C != 0 && E != 0 && L != 0 && P != 0);
     return 0;
 }
 
@@ -74,12 +80,21 @@ void preenche_vertices(Grafo *g)
         g->vertices[i] = i + 1;
 }
 
-void Busca_Largura(Grafo *g, int inicio)
+void limpa(Grafo *g)
 {
-    int i, j, cont = 0;
+    int i;
+    for (i = 0; i < g->ordem; i++)
+        g->visitados[i] = 0;
+}
+
+void Busca_Largura(Grafo *g, int inicio, int Pedagio, int conter)
+{
+    int i, j, cont = 0, P = 1;
+    int Cidades[g->ordem];
     for (i = 0; i < g->ordem; i++)
     {
         g->visitados[i] = 0;
+        Cidades[i] = -1;
     }
     g->visitados[inicio] = 1;
     for (i = 0; i < g->ordem; i++)
@@ -87,16 +102,36 @@ void Busca_Largura(Grafo *g, int inicio)
         if (g->adjacencias[inicio][i] == 1 && !g->visitados[i])
         {
             g->visitados[i] = 1;
+            Cidades[cont] = i;
+            cont++;
+
             for (j = 0; j < g->ordem; j++)
             {
                 if (g->adjacencias[i][j] == 1 && !g->visitados[j])
                 {
                     g->visitados[j] = 1;
-                    cont++;
+                    P++;
+                    if (P <= Pedagio)
+                    {
+                        Cidades[cont] = j;
+                        cont++;
+                    }
                 }
             }
+            P = 1;
         }
     }
+
+    qsort(Cidades, g->ordem, sizeof(int), cmpfunc);
+    printf("Teste %d\n", conter);
+    for (i = 0; i < g->ordem; i++)
+    {
+        if (Cidades[i] != -1)
+        {
+            printf("%d ", Cidades[i] + 1);
+        }
+    }
+    printf("\n\n");
 
     limpa(g);
 }
