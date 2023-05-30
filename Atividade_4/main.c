@@ -15,7 +15,7 @@ typedef struct grafo
 Grafo *cria_grafo(int n, int valorado, int direcionado);
 void preenche_vertices(Grafo *g);
 void limpa(Grafo *g);
-void bfs(Grafo *g, int inicio, int cont);
+void Busca_Largura(Grafo *g, int inicio);
 
 int main()
 {
@@ -23,6 +23,7 @@ int main()
     int lin = 0, col = 0;
     int cont = 1;
     int parametro = 1;
+    Grafo *g = NULL;
 
     do
     {
@@ -31,7 +32,7 @@ int main()
 
         if (E != 0 && L != 0)
         {
-            Grafo *g = cria_grafo(E, 0, 0);
+            g = cria_grafo(E, 0, 0);
             preenche_vertices(g);
             for (int i = 0; i < L; i++)
             {
@@ -41,8 +42,27 @@ int main()
                 g->adjacencias[lin - 1][col - 1] = 1;
                 g->adjacencias[col - 1][lin - 1] = 1;
             }
-            bfs(g, 0, cont);
+            Busca_Largura(g, 0);
 
+            for (int i = 0; i < g->ordem; i++)
+            {
+                if (!g->visitados[i])
+                {
+                    parametro = 0;
+                }
+            }
+
+            if (parametro == 1)
+            {
+                printf("Teste %d\n", cont);
+                printf("normal\n\n");
+            }
+            else
+            {
+                printf("Teste %d\n", cont);
+                printf("falha\n\n");
+            }
+            limpa(g);
             free(g);
             cont++;
         }
@@ -81,7 +101,7 @@ void limpa(Grafo *g)
         g->visitados[i] = 0;
 }
 
-void bfs(Grafo *g, int inicio, int cont)
+void Busca_Largura(Grafo *g, int inicio)
 {
     int i, j, parametro = 1;
     for (i = 0; i < g->ordem; i++)
@@ -103,25 +123,4 @@ void bfs(Grafo *g, int inicio, int cont)
             }
         }
     }
-    for (int i = 0; i < g->ordem; i++)
-    {
-        if (!g->visitados[i])
-        {
-            parametro = 0;
-        }
-    }
-
-    if (parametro == 1)
-    {
-        printf("Teste %d\n", cont);
-        printf("normal\n");
-        printf("\n");
-    }
-    else
-    {
-        printf("Teste %d\n", cont);
-        printf("falha\n");
-        printf("\n");
-    }
-    limpa(g);
 }
