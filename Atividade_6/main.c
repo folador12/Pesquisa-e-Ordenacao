@@ -5,6 +5,7 @@
 struct nod
 {
     char nome[21];
+    int T;
     struct nod *ant;
     struct nod *prox;
 };
@@ -36,8 +37,8 @@ typedef struct grafo
 
 // LISTA
 Listad *cria_listad();
-Nod *cria_nod(char valor[]);
-Listad *insere_fim_listad(Listad *L, char valor[]);
+Nod *cria_nod(char valor[], int T);
+Listad *insere_fim_listad(Listad *L, char valor[], int T);
 
 //  GRAFO
 Grafo *cria_grafo(int n);
@@ -49,7 +50,7 @@ void mostra_lista(Atr *L);
 
 int main(int argc, char const *argv[])
 {
-    int N = 0, C = 0, T1 = 0, T2 = 0, T3 = 0, Count = 0;
+    int N = 0, C = 0, T1 = 0, T2 = 0, T3 = 0, Count = 0, T = 0;
     int i = 0, j = 0;
     char nome[21];
     char Atr1[21], Atr2[21], Atr3[21];
@@ -93,13 +94,21 @@ int main(int argc, char const *argv[])
 
         for (i = 0; i < N; i++)
         {
+            for (j = 0; j < N; j++)
+            {
+                if (g->adjacencias[i][j] == 1)
+                {
+                    T++;
+                }
+            }
             scanf("%s", nome);
-            g->nomes = insere_fim_listad(g->nomes, nome);
+            g->nomes = insere_fim_listad(g->nomes, nome, T);
+            T = 0;
         }
 
-        // mostra_grafo(g);
-        mostra_lista(g->atributos);
-        // printf("\n\n");
+        mostra_grafo(g);
+
+        Count = 0;
 
         free(g);
 
@@ -116,17 +125,18 @@ Listad *cria_listad()
     return novalista;
 }
 
-Nod *cria_nod(char valor[])
+Nod *cria_nod(char valor[], int T)
 {
     Nod *novo = (Nod *)malloc(sizeof(Nod));
     novo->ant = novo->prox = NULL;
     strcpy(novo->nome, valor);
+    novo->T = T;
     return novo;
 }
 
-Listad *insere_fim_listad(Listad *L, char valor[])
+Listad *insere_fim_listad(Listad *L, char valor[], int T)
 {
-    Nod *novo = cria_nod(valor);
+    Nod *novo = cria_nod(valor, T);
 
     if (L == NULL)
     {
@@ -167,24 +177,29 @@ Grafo *cria_grafo(int n)
 
 void mostra_grafo(Grafo *g)
 {
-    int i, j;
+    int i, j, fileira = -1;
     Nod *aux = g->nomes->ini;
-    for (i = 0; i < g->ordem; i++)
+    Atr *aux2 = g->atributos;
+
+    while (aux != NULL)
     {
 
-        if (aux != NULL)
+        printf("%s: ", aux->nome);
+
+        while (aux2 != NULL)
         {
-            printf("%s ", aux->nome);
-            aux = aux->prox;
+            if (aux->T <= aux2->Peso && fileira != aux2->valor)
+            {
+                printf("%s ", aux2->atr);
+                fileira = aux2->valor;
+            }
+            aux2 = aux2->prox;
         }
 
-        for (j = 0; j < g->ordem; j++)
-        {
-            if (g->adjacencias[i][j] == 1)
-            {
-                printf("%d - ", j + 1);
-            }
-        }
+        aux2 = g->atributos;
+        fileira = -1;
+        aux = aux->prox;
+
         printf("\n");
     }
 }
@@ -233,16 +248,4 @@ Atr *insere_fim(Atr *L, char atr[], int peso, int valor)
         aux->prox = novo;
     }
     return L;
-}
-void mostra_lista(Atr *L)
-{
-    Atr *aux = L;
-
-    while (aux != NULL)
-    {
-        printf("%s %i %i ", aux->atr, aux->Peso, aux->valor);
-        printf("\n");
-        aux = aux->prox;
-    }
-    printf("\n");
 }
