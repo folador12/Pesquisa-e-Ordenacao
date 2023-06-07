@@ -1,0 +1,200 @@
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAXN 1000
+
+// -------------------- // LISTA // -------------------- //
+
+typedef struct node
+{
+    int vertice;
+    struct node *proximo;
+} Node;
+
+typedef struct lista_ligada
+{
+    Node *cabeca;
+} ListaLigada;
+
+Node *criar_no(int v)
+{
+    Node *novo_no = (Node *)malloc(sizeof(Node));
+    novo_no->vertice = v;
+    novo_no->proximo = NULL;
+    return novo_no;
+}
+
+ListaLigada *criar_lista_ligada()
+{
+    ListaLigada *lista = (ListaLigada *)malloc(sizeof(ListaLigada));
+    lista->cabeca = NULL;
+    return lista;
+}
+
+void adicionar_no(ListaLigada *lista, int v)
+{
+    Node *novo_no = criar_no(v);
+    novo_no->proximo = lista->cabeca;
+    lista->cabeca = novo_no;
+}
+
+// -------------------- // GRAFO DINAMICO // -------------------- //
+
+typedef struct grafo
+{
+    ListaLigada *lista_adjacencia;
+    int *tamanho_atributos;
+    char ***atributos;
+    int *processado;
+    int *grau;
+    int num_vertices;
+} Grafo;
+
+Grafo *criar_grafo(int num_vertices)
+{
+    Grafo *grafo = (Grafo *)malloc(sizeof(Grafo));
+    grafo->lista_adjacencia = (ListaLigada *)malloc(num_vertices * sizeof(ListaLigada));
+    grafo->tamanho_atributos = (int *)calloc(num_vertices, sizeof(int));
+    grafo->atributos = (char ***)malloc(num_vertices * sizeof(char **));
+    grafo->processado = (int *)calloc(num_vertices, sizeof(int));
+    grafo->grau = (int *)calloc(num_vertices, sizeof(int));
+    grafo->num_vertices = num_vertices;
+
+    for (int i = 0; i < num_vertices; i++)
+    {
+        grafo->lista_adjacencia[i].cabeca = NULL;
+        grafo->atributos[i] = (char **)malloc(MAXN * sizeof(char *));
+        for (int j = 0; j < MAXN; j++)
+        {
+            grafo->atributos[i][j] = (char *)malloc(21 * sizeof(char));
+        }
+    }
+
+    return grafo;
+}
+
+void adicionar_aresta(Grafo *grafo, int origem, int destino)
+{
+    adicionar_no(&grafo->lista_adjacencia[origem], destino);
+    grafo->grau[origem]++;
+}
+
+void liberar_memoria(Grafo *grafo)
+{
+    for (int i = 0; i < grafo->num_vertices; i++)
+    {
+        Node *temp = grafo->lista_adjacencia[i].cabeca;
+        while (temp != NULL)
+        {
+            Node *next = temp->proximo;
+            free(temp);
+            temp = next;
+        }
+        for (int j = 0; j < MAXN; j++)
+        {
+            free(grafo->atributos[i][j]);
+        }
+        free(grafo->atributos[i]);
+    }
+    free(grafo->lista_adjacencia);
+    free(grafo->tamanho_atributos);
+    free(grafo->atributos);
+    free(grafo->processado);
+    free(grafo->grau);
+    free(grafo);
+}
+
+void dfs(Grafo *grafo, int x, int t1, int t2, char *a1, char *a2, char *a3)
+{
+    grafo->processado[x] = 1;
+    grafo->tamanho_atributos[x]--;
+
+    if (grafo->grau[x] < t1)
+    {
+        strcpy(grafo->atributos[x][grafo->tamanho_atributos[x]++], a1);
+    }
+
+    else if (grafo->grau[x] < t2)
+    {
+        strcpy(grafo->atributos[x][grafo->tamanho_atributos[x]++], a2);
+    }
+
+    else
+    {
+        strcpy(grafo->atributos[x][grafo->tamanho_atributos[x]++], a3);
+    }
+
+    Node *temp = grafo->lista_adjacencia[x].cabeca;
+    while (temp != NULL)
+    {
+        int v = temp->vertice;
+        if (grafo->processado[v] == 0)
+        {
+            dfs(grafo, v, t1, t2, a1, a2, a3);
+        }
+
+        temp = temp->proximo;
+    }
+}
+
+// -------------------- // MAIN // -------------------- //
+int main()
+{
+    int N;
+    int T1, T2, T3;
+    int i, j;
+    char nome[21];
+
+    char Atr1[MAXN], Atr2[MAXN], Atr3[MAXN];
+
+    while (scanf("%d", &N) && N != 0)
+    {
+
+        Grafo *g = criar_grafo(N + 1);
+
+        for (i = 1; i <= N; i++)
+        {
+
+            while (scanf("%d", &j) && j != 0)
+            {
+                adicionar_aresta(g, i, j);
+            }
+        }
+
+        while (scanf("%d", &T1) && T1 != 0 && T1 <= N)
+        {
+
+            scanf("%d %d %s %s %s", &T2, &T3, Atr1, Atr2, Atr3);
+
+            for (int i = 1; i <= N; i++)
+            {
+
+                g->processado[i] = 0;
+
+                strcpy(g->atributos[i][g->tamanho_atributos[i]++], Atr1);
+            }
+
+            dfs(g, T1, T2, T3, Atr1, Atr2, Atr3);
+        }
+
+        for (int i = 1; i <= N; i++)
+        {
+
+            scanf("%s", nome);
+
+            printf("%s: ", nome);
+
+            for (int j = 0; j < g->tamanho_atributos[i]; j++)
+            {
+                printf("%s ", g->atributos[i][j]);
+            }
+            printf("\n");
+        }
+
+        liberar_memoria(g);
+    }
+    return 0;
+}

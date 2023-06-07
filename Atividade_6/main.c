@@ -2,51 +2,19 @@
 #include <stdio.h>
 #include <string.h>
 
-struct nod
-{
-    char nome[21];
-    int T;
-    struct nod *ant;
-    struct nod *prox;
-};
-typedef struct nod Nod;
-
-struct listad
-{
-    Nod *ini;
-    Nod *fim;
-};
-typedef struct listad Listad;
-
-typedef struct atr
-{
-    char atr[21];
-    int Peso;
-    int valor;
-    struct atr *prox;
-} Atr;
-
 typedef struct grafo
 {
     int ordem;
     int **adjacencias;
     int *visitados;
-    Listad *nomes;
-    Atr *atributos;
+    char ***atributos;
+    int *tamanho_atributos;
+    int *grau;
 } Grafo;
-
-// LISTA
-Listad *cria_listad();
-Nod *cria_nod(char valor[], int T);
-Listad *insere_fim_listad(Listad *L, char valor[], int T);
 
 //  GRAFO
 Grafo *cria_grafo(int n);
-void mostra_grafo(Grafo *g);
-void dfs(Grafo *grafo, int p);
-Atr *cria_atr(char atr[], int peso, int valor);
-Atr *insere_fim(Atr *L, char atr[], int peso, int valor);
-void mostra_lista(Atr *L);
+void dfs(Grafo *grafo, int x, int t1, int t2, char *a1, char *a2, char *a3);
 
 int main(int argc, char const *argv[])
 {
@@ -59,7 +27,7 @@ int main(int argc, char const *argv[])
     do
     {
         scanf("%d", &N);
-        g = cria_grafo(N);
+        g = cria_grafo(N + 1);
 
         for (i = 0; i < N; i++)
         {
@@ -83,32 +51,30 @@ int main(int argc, char const *argv[])
                 scanf("%d %d", &T2, &T3);
                 scanf("%s %s %s", Atr1, Atr2, Atr3);
 
-                g->atributos = insere_fim(g->atributos, Atr1, T1, Count);
-                g->atributos = insere_fim(g->atributos, Atr2, T2, Count);
-                g->atributos = insere_fim(g->atributos, Atr3, T3, Count);
+                for (int i = 1; i <= N; i++)
+                {
+                    g->visitados[i] = 0;
+                    strcpy(g->atributos[i][g->tamanho_atributos[i]++], Atr1);
+                }
 
-                Count++;
+                dfs(g, T1, T2, T3, Atr1, Atr2, Atr3);
             }
 
         } while (T1 != 0);
 
         for (i = 0; i < N; i++)
         {
-            for (j = 0; j < N; j++)
-            {
-                if (g->adjacencias[i][j] == 1)
-                {
-                    T++;
-                }
-            }
+
             scanf("%s", nome);
-            g->nomes = insere_fim_listad(g->nomes, nome, T);
-            T = 0;
+            printf("%s: ", nome);
+
+            for (j = 0; j < g->tamanho_atributos[i]; j++)
+            {
+                printf("%s ", g->atributos[i][j]);
+            }
+
+            printf("\n");
         }
-
-        mostra_grafo(g);
-
-        Count = 0;
 
         free(g);
 
@@ -117,57 +83,15 @@ int main(int argc, char const *argv[])
     return 0;
 }
 
-Listad *cria_listad()
-{
-    Listad *novalista;
-    novalista = (Listad *)malloc(sizeof(Listad));
-    novalista->ini = novalista->fim = NULL;
-    return novalista;
-}
-
-Nod *cria_nod(char valor[], int T)
-{
-    Nod *novo = (Nod *)malloc(sizeof(Nod));
-    novo->ant = novo->prox = NULL;
-    strcpy(novo->nome, valor);
-    novo->T = T;
-    return novo;
-}
-
-Listad *insere_fim_listad(Listad *L, char valor[], int T)
-{
-    Nod *novo = cria_nod(valor, T);
-
-    if (L == NULL)
-    {
-        L = cria_listad();
-        L->ini = L->fim = novo;
-    }
-    else
-    {
-
-        if (L->ini == NULL)
-        {
-            L->ini = L->fim = novo;
-        }
-        else
-        {
-            novo->ant = L->fim;
-            L->fim->prox = novo;
-            L->fim = novo;
-        }
-    }
-    return L;
-}
-
 Grafo *cria_grafo(int n)
 {
     int i, j;
     Grafo *g = (Grafo *)malloc(sizeof(Grafo));
     g->ordem = n;
-    g->visitados = (int *)calloc(n, sizeof(int));
-    g->nomes = cria_listad();
+    g->grau = (int *)calloc(n, sizeof(int));
     g->atributos = NULL;
+    g->tamanho_atributos = (int *)calloc(n, sizeof(int));
+    g->atributos = (char ***)malloc(n * sizeof(char **));
     g->adjacencias = (int **)malloc(sizeof(int *) * n);
     for (i = 0; i < n; i++)
         g->adjacencias[i] = (int *)malloc(sizeof(int) * n);
@@ -175,77 +99,26 @@ Grafo *cria_grafo(int n)
     return g;
 }
 
-void mostra_grafo(Grafo *g)
+void dfs(Grafo *grafo, int x, int t1, int t2, char *a1, char *a2, char *a3)
 {
-    int i, j, fileira = -1;
-    Nod *aux = g->nomes->ini;
-    Atr *aux2 = g->atributos;
+    grafo->visitados[x] = 1;
+    grafo->tamanho_atributos[x]--;
 
-    while (aux != NULL)
-    {
+    if (grafo->grau[x] < t1)
+        strcpy(grafo->atributos[x][grafo->tamanho_atributos[x]++], a1);
+    else if (grafo->grau[x] < t2)
+        strcpy(grafo->atributos[x][grafo->tamanho_atributos[x]++], a2);
+    else
+        strcpy(grafo->atributos[x][grafo->tamanho_atributos[x]++], a3);
 
-        printf("%s: ", aux->nome);
-
-        while (aux2 != NULL)
-        {
-            if (aux->T <= aux2->Peso && fileira != aux2->valor)
-            {
-                printf("%s ", aux2->atr);
-                fileira = aux2->valor;
-            }
-            aux2 = aux2->prox;
-        }
-
-        aux2 = g->atributos;
-        fileira = -1;
-        aux = aux->prox;
-
-        printf("\n");
-    }
-}
-
-void dfs(Grafo *grafo, int p)
-{
-    if (grafo->visitados[p])
-        return;
-    grafo->visitados[p] = 1;
     for (int i = 0; i < grafo->ordem; i++)
     {
-        if (grafo->adjacencias[p][i])
+        for (int j = 0; j < grafo->ordem; j++)
         {
-            dfs(grafo, i);
+            if (grafo->visitados[i] == 0)
+            {
+                dfs(grafo, i, t1, t2, a1, a2, a3);
+            }
         }
     }
-}
-
-Atr *cria_atr(char atr[], int peso, int valor)
-{
-    Atr *novo;
-    novo = (Atr *)malloc(sizeof(Atr));
-    novo->prox = NULL;
-    novo->valor = valor;
-    novo->Peso = peso;
-    strcpy(novo->atr, atr);
-    return novo;
-}
-
-Atr *insere_fim(Atr *L, char atr[], int peso, int valor)
-{
-    Atr *novo = cria_atr(atr, peso, valor);
-    Atr *aux = L;
-
-    if (L == NULL)
-    {
-        L = novo;
-    }
-    else
-    {
-
-        while (aux->prox != NULL)
-        {
-            aux = aux->prox;
-        }
-        aux->prox = novo;
-    }
-    return L;
 }
