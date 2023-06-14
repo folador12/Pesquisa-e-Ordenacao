@@ -15,7 +15,8 @@ typedef struct grafo
 Grafo *cria_grafo(int n, int c);
 void preenche_vertices(Grafo *g);
 void limpa(Grafo *g);
-void Busca_Largura(Grafo *g, int inicio);
+void Busca_Largura(Grafo *g);
+void Busca_Profundidade(Grafo *g, int inicio);
 
 int main()
 {
@@ -25,13 +26,13 @@ int main()
     scanf("%d", &N);
     scanf("%d", &CA);
 
-    Grafo *g  = cria_grafo(N,CA);
+    Grafo *g = cria_grafo(N, CA);
     preenche_vertices(g);
     for (int i = 0; i < N; i++)
     {
-        scanf("%d",&g->imposto[i]);
+        scanf("%d", &g->imposto[i]);
     }
-    
+
     for (int i = 0; i < N; i++)
     {
         scanf("%d", &A);
@@ -41,17 +42,15 @@ int main()
         g->adjacencias[A - 1][B - 1] = C;
         g->adjacencias[B - 1][A - 1] = C;
     }
-    
 
     limpa(g);
     free(g);
-    
 }
 
 // GRAFO
 Grafo *cria_grafo(int n, int c)
 {
-    int i;
+    int i, j;
     Grafo *g = (Grafo *)malloc(sizeof(Grafo));
     g->ordem = n;
     g->carga_maxima = c;
@@ -61,6 +60,15 @@ Grafo *cria_grafo(int n, int c)
     g->adjacencias = (int **)malloc(sizeof(int *) * n);
     for (i = 0; i < n; i++)
         g->adjacencias[i] = (int *)malloc(sizeof(int) * n);
+
+    for (i = 0; i < n; i++)
+    {
+        for (j = 0; j < n; j++)
+        {
+            g->adjacencias[i][j];
+        }
+    }
+
     return g;
 }
 
@@ -78,19 +86,21 @@ void limpa(Grafo *g)
         g->visitados[i] = 0;
 }
 
-void Busca_Largura(Grafo *g, int inicio)
+void Busca_Largura(Grafo *g)
 {
     int i, j;
+    int distancia = 0;
     for (i = 0; i < g->ordem; i++)
     {
         g->visitados[i] = 0;
     }
-    g->visitados[inicio] = 1;
+    g->visitados[0] = 1;
     for (i = 0; i < g->ordem; i++)
     {
-        if (g->adjacencias[inicio][i] == 1 && !g->visitados[i])
+        if (g->adjacencias[0][i] == 1 && !g->visitados[i])
         {
             g->visitados[i] = 1;
+
             for (j = 0; j < g->ordem; j++)
             {
                 if (g->adjacencias[i][j] == 1 && !g->visitados[j])
@@ -98,6 +108,20 @@ void Busca_Largura(Grafo *g, int inicio)
                     g->visitados[j] = 1;
                 }
             }
+        }
+    }
+}
+
+void Busca_Profundidade(Grafo *g, int inicio)
+{
+    int i;
+    g->visitados[inicio] = 1;
+    printf("%d ", inicio);
+    for (i = 0; i < g->ordem; i++)
+    {
+        if (g->adjacencias[inicio][i] == 1 && !g->visitados[i])
+        {
+            dfs(g, i);
         }
     }
 }
