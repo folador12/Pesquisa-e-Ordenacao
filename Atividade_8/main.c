@@ -13,7 +13,7 @@ int main()
     {
         scanf("%d %d", &N, &M);
 
-        if (N != 0 && M != 0)
+        if (N != 0)
         {
             X = (int *)malloc(M * sizeof(int));
 
@@ -28,7 +28,7 @@ int main()
             free(X);
         }
 
-    } while (N != 0 && M != 0);
+    } while (N != 0);
 
     return 0;
 }
