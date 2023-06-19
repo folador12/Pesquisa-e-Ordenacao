@@ -1,127 +1,79 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef struct grafo
-{
-    int ordem;
-    int *vertices;
-    int **adjacencias;
-    int *visitados;
-    int *imposto;
-    int carga_maxima;
-} Grafo;
-
-// GRAFO
-Grafo *cria_grafo(int n, int c);
-void preenche_vertices(Grafo *g);
-void limpa(Grafo *g);
-void Busca_Largura(Grafo *g);
-void Busca_Profundidade(Grafo *g, int inicio);
+void bubble_sort(int intercambio[], int N, int M);
 
 int main()
 {
-    int N = 0, CA = 0;
-    int A = 0, B = 0, C = 0;
 
-    scanf("%d", &N);
-    scanf("%d", &CA);
+    int N = 0, M = 0, i = 0;
+    int *X;
 
-    Grafo *g = cria_grafo(N, CA);
-    preenche_vertices(g);
-    for (int i = 0; i < N; i++)
+    do
     {
-        scanf("%d", &g->imposto[i]);
-    }
+        scanf("%d %d", &N, &M);
 
-    for (int i = 0; i < N; i++)
-    {
-        scanf("%d", &A);
-        scanf("%d", &B);
-        scanf("%d", &C);
-
-        g->adjacencias[A - 1][B - 1] = C;
-        g->adjacencias[B - 1][A - 1] = C;
-    }
-
-    limpa(g);
-    free(g);
-}
-
-// GRAFO
-Grafo *cria_grafo(int n, int c)
-{
-    int i, j;
-    Grafo *g = (Grafo *)malloc(sizeof(Grafo));
-    g->ordem = n;
-    g->carga_maxima = c;
-    g->vertices = (int *)malloc(sizeof(int) * n);
-    g->visitados = (int *)malloc(sizeof(int) * n);
-    g->imposto = (int *)malloc(sizeof(int) * n);
-    g->adjacencias = (int **)malloc(sizeof(int *) * n);
-    for (i = 0; i < n; i++)
-        g->adjacencias[i] = (int *)malloc(sizeof(int) * n);
-
-    for (i = 0; i < n; i++)
-    {
-        for (j = 0; j < n; j++)
+        if (N != 0)
         {
-            g->adjacencias[i][j];
-        }
-    }
+            X = (int *)malloc(M * sizeof(int));
 
-    return g;
-}
-
-void preenche_vertices(Grafo *g)
-{
-    int i;
-    for (i = 0; i < g->ordem; i++)
-        g->vertices[i] = i + 1;
-}
-
-void limpa(Grafo *g)
-{
-    int i;
-    for (i = 0; i < g->ordem; i++)
-        g->visitados[i] = 0;
-}
-
-void Busca_Largura(Grafo *g)
-{
-    int i, j;
-    int distancia = 0;
-    for (i = 0; i < g->ordem; i++)
-    {
-        g->visitados[i] = 0;
-    }
-    g->visitados[0] = 1;
-    for (i = 0; i < g->ordem; i++)
-    {
-        if (g->adjacencias[0][i] == 1 && !g->visitados[i])
-        {
-            g->visitados[i] = 1;
-
-            for (j = 0; j < g->ordem; j++)
+            for (i = M - 1; i >= 0; i--)
             {
-                if (g->adjacencias[i][j] == 1 && !g->visitados[j])
+
+                scanf("%d", &X[i]);
+            }
+
+            bubble_sort(X, N, M);
+            printf("\n");
+            free(X);
+        }
+
+    } while (N != 0);
+
+    return 0;
+}
+
+void bubble_sort(int vetor[], int N, int M)
+{
+
+    int cont = M, aux = 0, flag = 0, k = 0;
+    int indice[N];
+
+    for (int i = 0; i < N; i++)
+    {
+        indice[i] = i + 1;
+    }
+
+    for (int i = 0; i < M; i++)
+    {
+
+        for (int j = N - 1; j >= 0; j--)
+        {
+
+            if (indice[j] == cont)
+            {
+
+                k = j;
+
+                while (flag < vetor[i])
                 {
-                    g->visitados[j] = 1;
+
+                    aux = indice[k];
+                    indice[k] = indice[k + 1];
+                    indice[k + 1] = aux;
+
+                    flag++;
+                    k++;
                 }
             }
         }
-    }
-}
 
-void Busca_Profundidade(Grafo *g, int inicio)
-{
-    int i;
-    g->visitados[inicio] = 1;
-    printf("%d ", inicio);
-    for (i = 0; i < g->ordem; i++)
+        cont--;
+        flag = 0;
+    }
+
+    for (int i = 0; i < N; i++)
     {
-        if (g->adjacencias[inicio][i] == 1 && !g->visitados[i])
-        {
-            dfs(g, i);
-        }
+        printf("%i ", indice[i]);
     }
 }

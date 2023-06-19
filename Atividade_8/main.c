@@ -1,29 +1,39 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void bubble_sort(int intercambio[], int N, int M);
+int bubble_sort(int vetor[], int n);
 
 int main()
 {
 
-    int N = 0, M = 0, i = 0;
+    int N = 0, C = 0, i = 0;
     int *X;
 
     do
     {
-        scanf("%d %d", &N, &M);
+        scanf("%d", &N);
 
         if (N != 0)
         {
-            X = (int *)malloc(M * sizeof(int));
+            X = (int *)malloc(N * sizeof(int));
 
-            for (i = M - 1; i >= 0; i--)
+            for (i = 0; i < N; i++)
             {
 
                 scanf("%d", &X[i]);
             }
 
-            bubble_sort(X, N, M);
+            C = bubble_sort(X, N);
+
+            if (C % 2 == 0)
+            {
+                printf("Carlos");
+            }
+            else
+            {
+                printf("Marcelo");
+            }
+
             printf("\n");
             free(X);
         }
@@ -33,47 +43,24 @@ int main()
     return 0;
 }
 
-void bubble_sort(int vetor[], int N, int M)
+int bubble_sort(int vetor[], int n)
 {
+    int k, j, aux, cont = 0;
 
-    int cont = M, aux = 0, flag = 0, k = 0;
-    int indice[N];
-
-    for (int i = 0; i < N; i++)
-    {
-        indice[i] = i + 1;
-    }
-
-    for (int i = 0; i < M; i++)
+    for (k = 1; k < n; k++)
     {
 
-        for (int j = N - 1; j >= 0; j--)
+        for (j = 0; j < n - 1; j++)
         {
 
-            if (indice[j] == cont)
+            if (vetor[j] > vetor[j + 1])
             {
-
-                k = j;
-
-                while (flag < vetor[i])
-                {
-
-                    aux = indice[k];
-                    indice[k] = indice[k + 1];
-                    indice[k + 1] = aux;
-
-                    flag++;
-                    k++;
-                }
+                aux = vetor[j];
+                vetor[j] = vetor[j + 1];
+                vetor[j + 1] = aux;
+                cont++;
             }
         }
-
-        cont--;
-        flag = 0;
     }
-
-    for (int i = 0; i < N; i++)
-    {
-        printf("%i ", indice[i]);
-    }
+    return cont;
 }
