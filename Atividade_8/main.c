@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int bubble_sort(int vetor[], int n);
+void merge(int vet[], int l, int m, int r, int *c);
+void mergeSort(int vet[], int l, int r, int *c);
 
 int main()
 {
@@ -23,7 +24,7 @@ int main()
                 scanf("%d", &X[i]);
             }
 
-            C = bubble_sort(X, N);
+            mergeSort(X, 0, N - 1, &C);
 
             if (C % 2 == 0)
             {
@@ -36,6 +37,7 @@ int main()
 
             printf("\n");
             free(X);
+            C = 0;
         }
 
     } while (N != 0);
@@ -43,24 +45,68 @@ int main()
     return 0;
 }
 
-int bubble_sort(int vetor[], int n)
+void merge(int vet[], int l, int m, int r, int *c)
 {
-    int k, j, aux, cont = 0;
+    int i, j, k;
+    int n1 = m - l + 1;
+    int n2 = r - m;
+    int L[n1], R[n2];
 
-    for (k = 1; k < n; k++)
+    for (i = 0; i < n1; i++)
     {
-
-        for (j = 0; j < n - 1; j++)
-        {
-
-            if (vetor[j] > vetor[j + 1])
-            {
-                aux = vetor[j];
-                vetor[j] = vetor[j + 1];
-                vetor[j + 1] = aux;
-                cont++;
-            }
-        }
+        L[i] = vet[l + i];
     }
-    return cont;
+
+    for (j = 0; j < n2; j++)
+    {
+        R[j] = vet[m + 1 + j];
+    }
+
+    i = 0;
+    j = 0;
+    k = l;
+
+    while (i < n1 && j < n2)
+    {
+        if (L[i] <= R[j])
+        {
+            vet[k] = L[i];
+            i++;
+        }
+        else
+        {
+            vet[k] = R[j];
+            (*c) += n1 - i;
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1)
+    {
+        vet[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2)
+    {
+        vet[k] = R[j];
+        j++;
+        k++;
+    }
+}
+
+void mergeSort(int vet[], int l, int r, int *c)
+{
+    if (l < r)
+    {
+        int m = l + (r - l) / 2;
+
+        mergeSort(vet, l, m, c);
+
+        mergeSort(vet, m + 1, r, c);
+        
+        merge(vet, l, m, r, c);
+    }
 }
